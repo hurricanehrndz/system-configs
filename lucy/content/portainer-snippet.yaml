@@ -1,0 +1,64 @@
+---
+variant: fcos
+version: 1.4.0
+passwd:
+  users:
+    - name: portainer
+      no_create_home: true
+      shell: /bin/false
+      groups:
+        - docker
+        - isolated
+
+# based on https://github.com/mediadepot/ignition/blob/master/ignition.d/portainer.yaml
+storage:
+  directories:
+    - path: "/etc/docker/compose/portainer"
+      mode: 0750
+      user:
+        name: portainer
+      group:
+        name: isolated
+    - path: "/var/srv/portainer"
+      mode: 0750
+      user:
+        name: portainer
+      group:
+        name: isolated
+  files:
+    - path: "/etc/docker/compose/portainer/docker-compose.yml"
+      mode: 0640
+      user:
+        name: portainer
+      group:
+        name: isolated
+      contents:
+        inline: |-
+          version: "3.9"
+          services:
+            portainer:
+              image: portainer/portainer
+              volumes:
+                - /var/srv/portainer:/data
+                - /var/run/docker.sock:/var/run/docker.sock
+              ports:
+                - 9000:9000
+              labels:
+                - "traefik.enable=true"
+                - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+                - "traefik.http.routers.portainer.rule=Host(`admin.${domain_name}`)"
+                - "traefik.http.routers.portainer.entrypoints=websecure"
+                - "traefik.http.routers.portainer.tls.certresolver=mydnschallenge"
+              command:
+                - "--no-analytics"
+                - "--host=unix:///var/run/docker.sock"
+              networks:
+                - traefik
+          networks:
+            traefik:
+              external: true
+
+systemd:
+  units:
+    - name: docker-compose@portainer.service
+      enabled: true

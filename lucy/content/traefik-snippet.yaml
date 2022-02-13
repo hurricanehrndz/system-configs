@@ -1,0 +1,95 @@
+---
+variant: fcos
+version: 1.4.0
+passwd:
+  users:
+    - name: traefik
+      no_create_home: true
+      shell: /bin/false
+      groups:
+        - docker
+        - isolated
+
+storage:
+  directories:
+    - path: "/etc/docker/compose/traefik"
+      mode: 0750
+      user:
+        name: traefik
+      group:
+        name: isolated
+    - path: "/srv/traefik"
+      mode: 0750
+      user:
+        name: traefik
+      group:
+        name: isolated
+    - path: "/srv/traefik/letsencrypt"
+      mode: 0750
+      user:
+        name: traefik
+      group:
+        name: isolated
+
+  files:
+    - path: "/etc/docker/compose/traefik/docker-compose.yml"
+      mode: 0640
+      user:
+        name: traefik
+      group:
+        name: isolated
+      contents:
+        inline: |-
+          version: '3'
+          services:
+            traefik:
+              image: traefik:v2.0
+              ports:
+                # The HTTP port
+                - "80:80"
+                # The HTTPS port
+                - "443:443"
+                # The Web UI (enabled by --api.insecure=true)
+                - "8080:8080"
+              volumes:
+                - "/var/run/docker.sock:/var/run/docker.sock:ro"
+                - "/srv/traefik/letsencrypt:/letsencrypt"
+              command:
+                - "--api.insecure=true"
+                - "--providers.docker"
+                - "--providers.docker.network=traefik"
+                - "--entrypoints.web.address=:80"
+                - "--entrypoints.websecure.address=:443"
+                - "--providers.docker.defaultRule=Host(`{{ normalize .Name }}.${domain_name}`)"
+                - "--certificatesresolvers.mydnschallenge.acme.dnschallenge=true"
+                - "--certificatesresolvers.mydnschallenge.acme.dnschallenge.provider=cloudflare"
+                - "--certificatesresolvers.mydnschallenge.acme.email=postmaster@${domain_name}"
+                - "--certificatesresolvers.mydnschallenge.acme.storage=/letsencrypt/acme.json"
+                - "--serverstransport.forwardingtimeouts.idleconntimeout=10"
+              labels:
+                # https://traefik.io/blog/traefik-2-0-docker-101-fc2893944b9d/
+                # middleware redirect
+                - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+                # global redirect to https
+                - "traefik.http.routers.redirs.rule=hostregexp(`{host:.+}`)"
+                - "traefik.http.routers.redirs.entrypoints=web"
+                - "traefik.http.routers.redirs.middlewares=redirect-to-https"
+
+
+                # router for traefik dsahboard
+                - "traefik.http.routers.traefik.rule=Host(`traefik.${domain_name}`)"
+                - "traefik.http.routers.traefik.entrypoints=websecure"
+                - "traefik.http.routers.traefik.service=api@internal"
+                - "traefik.http.routers.traefik.tls.certresolver=mydnschallenge"
+              environment:
+                - "CF_DNS_API_TOKEN=${cf_dns_api_token}"
+              networks:
+                - traefik
+          networks:
+            traefik:
+              external: true
+systemd:
+  units:
+    - name: docker-compose@traefik.service
+      enabled: true
