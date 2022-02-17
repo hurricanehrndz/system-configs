@@ -10,7 +10,8 @@ data "ct_config" "fc-lucy-config" {
   pretty_print = true
 
   snippets = [
-    file("${path.module}/content/docker-snippet.yaml")
+    file("${path.module}/content/docker-snippet.yaml"),
+    local.portainer-snippet-rendered
   ]
 }
 
@@ -19,7 +20,16 @@ locals {
   base-config-template-rendered = templatefile(
     "${path.module}/content/base.yaml",
     {
-      hostname = "lucy"
+      hostname = "lucy",
+      isolated_id = var.isolated_id
+    }
+  )
+  portainer-snippet-rendered = templatefile(
+    "${path.module}/content/portainer-snippet.yaml",
+    {
+      domain_name = var.domain_name,
+      portainer_id = var.portainer_id,
+      isolated_id = var.isolated_id
     }
   )
 }

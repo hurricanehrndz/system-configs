@@ -6,6 +6,11 @@ systemd:
     - name: docker.service
       mask: false
       enabled: true
+      dropins:
+        - name: traefik-network.conf
+          contents: |-
+            [Service]
+            ExecStartPost=-/usr/bin/docker network create traefik
 
     - name: docker-compose@.service
       contents: |-
@@ -23,7 +28,6 @@ systemd:
 
         ExecStartPre=-/usr/local/bin/docker-compose pull
         ExecStartPre=-/usr/local/bin/docker-compose rm -v -f -s
-        ExecStartPre=-/usr/bin/docker image prune -f
 
         ExecStart=/usr/local/bin/docker-compose up --force-recreate --remove-orphans
 
@@ -32,6 +36,33 @@ systemd:
         [Install]
         WantedBy=multi-user.target
         WantedBy=docker.service
+
+    - name: docker-cleanup.service
+      contents: |-
+        [Unit]
+        Description=Docker cleanup
+        Requires=docker.service
+        After=docker.service
+
+        [Service]
+        Type=oneshot
+        WorkingDirectory=/tmp
+        ExecStart=/usr/bin/docker system prune -af
+
+        [Install]
+        WantedBy=multi-user.target
+
+    - name: docker-cleanup.timer
+      enabled: true
+      contents: |-
+        [Unit]
+        Description=Docker cleanup timer
+
+        [Timer]
+        OnCalendar=*-*-* 4:00:00
+
+        [Install]
+        WantedBy=timers.target
 
 storage:
   # paths fully specified
@@ -46,5 +77,4 @@ storage:
     - path: /usr/local/bin/docker-compose
       mode: 0755
       contents:
-        remote:
-          url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-linux-x86_64
+        source: https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64

@@ -6,6 +6,9 @@ passwd:
     - name: portainer
       no_create_home: true
       shell: /bin/false
+      uid: ${portainer_id}
+      no_user_group: true
+      primary_group: isolated
       groups:
         - docker
         - isolated
@@ -38,9 +41,10 @@ storage:
           services:
             portainer:
               image: portainer/portainer
+              user: "${portainer_id}:${isolated_id}"
               volumes:
-                - /var/srv/portainer:/data
-                - /var/run/docker.sock:/var/run/docker.sock
+                - /var/srv/portainer:/data:z
+                - /var/run/docker.sock:/var/run/docker.sock:z
               ports:
                 - 9000:9000
               labels:
