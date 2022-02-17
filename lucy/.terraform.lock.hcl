@@ -5,6 +5,7 @@ provider "registry.terraform.io/hashicorp/local" {
   version     = "2.1.0"
   constraints = "~> 2.1"
   hashes = [
+    "h1:KfieWtVyGWwplSoLIB5usKAUnrIkDQBkWaR5TI+4WYg=",
     "h1:PaQTpxHMbZB9XV+c1od1eaUvndQle3ZZHx79hrI6C3k=",
     "zh:0f1ec65101fa35050978d483d6e8916664b7556800348456ff3d09454ac1eae2",
     "zh:36e42ac19f5d68467aacf07e6adcf83c7486f2e5b5f4339e9671f68525fc87ab",
@@ -24,6 +25,7 @@ provider "registry.terraform.io/poseidon/ct" {
   version     = "0.9.1"
   constraints = "0.9.1"
   hashes = [
+    "h1:LWMX1hhWX97slT1xwxomQp6V4MMem3fc3yoUWro97rY=",
     "h1:mNrWYeIjoCGIC3Wl4cKjAsY969beae5/yYUI87IUPJ0=",
     "zh:554318bb98bac9f15aaab6e0ed78e3ca4fd4dc8f7b83bf5da8010a7cc113a6ac",
     "zh:87facbed49969b0ebbd7f29c3a40ebd471cb99e9ef12c084bd9186d1f9561faa",
