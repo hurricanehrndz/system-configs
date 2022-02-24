@@ -41,6 +41,7 @@ storage:
           services:
             portainer:
               image: portainer/portainer
+              container_name: portainer
               user: "${portainer_id}:${isolated_id}"
               volumes:
                 - /var/srv/portainer:/data:z
@@ -50,7 +51,9 @@ storage:
               labels:
                 - "traefik.enable=true"
                 - "traefik.http.services.portainer.loadbalancer.server.port=9000"
-                - "traefik.http.routers.portainer.rule=Host(`admin.${domain_name}`)"
+                - "traefik.http.routers.portainer.rule=Host(`${hostname}.${domain_name}`) && PathPrefix(`/portainer`)"
+                - "traefik.http.middlewares.portainer-stripprefix.stripprefix.prefixes=/portainer"
+                - "traefik.http.routers.portainer.middlewares=our-slash"
                 - "traefik.http.routers.portainer.entrypoints=websecure"
                 - "traefik.http.routers.portainer.tls.certresolver=mydnschallenge"
               command:

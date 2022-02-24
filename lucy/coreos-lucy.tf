@@ -11,7 +11,8 @@ data "ct_config" "fc-lucy-config" {
 
   snippets = [
     file("${path.module}/content/docker-snippet.yaml"),
-    local.portainer-snippet-rendered
+    local.portainer-snippet-rendered,
+    local.traefik-snippet-rendered
   ]
 }
 
@@ -20,7 +21,7 @@ locals {
   base-config-template-rendered = templatefile(
     "${path.module}/content/base.yaml",
     {
-      hostname = "lucy",
+      hostname = var.hostname,
       isolated_id = var.isolated_id
     }
   )
@@ -28,8 +29,19 @@ locals {
     "${path.module}/content/portainer-snippet.yaml",
     {
       domain_name = var.domain_name,
+      hostname = var.hostname,
       portainer_id = var.portainer_id,
       isolated_id = var.isolated_id
+    }
+  )
+  traefik-snippet-rendered = templatefile(
+    "${path.module}/content/traefik-snippet.yaml",
+    {
+      domain_name = var.domain_name,
+      hostname = var.hostname,
+      traefik_id = var.traefik_id,
+      isolated_id = var.isolated_id,
+      cf_dns_api_token = var.cf_dns_api_token
     }
   )
 }

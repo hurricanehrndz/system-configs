@@ -6,6 +6,9 @@ passwd:
     - name: traefik
       no_create_home: true
       shell: /bin/false
+      uid: ${traefik_id}
+      no_user_group: true
+      primary_group: isolated
       groups:
         - docker
         - isolated
@@ -40,23 +43,24 @@ storage:
         name: isolated
       contents:
         inline: |-
-          version: '3'
+          version: "3.9"
           services:
             traefik:
-              image: traefik:v2.0
+              image: traefik:v2.6
+              container_name: traefik
+              privileged: true
+              user: "${traefik_id}:$${DOCKER_GROUP_ID}"
               ports:
-                # The HTTP port
-                - "80:80"
-                # The HTTPS port
-                - "443:443"
-                # The Web UI (enabled by --api.insecure=true)
-                - "8080:8080"
+                - 80:80
+                - 443:443
+                - 8080:8080
               volumes:
-                - "/var/run/docker.sock:/var/run/docker.sock:ro"
-                - "/srv/traefik/letsencrypt:/letsencrypt"
+                - /var/run/docker.sock:/var/run/docker.sock:ro
+                - /srv/traefik/letsencrypt:/letsencrypt:z
               command:
                 - "--api.insecure=true"
                 - "--providers.docker"
+                - "--providers.docker.exposedbydefault=false"
                 - "--providers.docker.network=traefik"
                 - "--entrypoints.web.address=:80"
                 - "--entrypoints.websecure.address=:443"
@@ -69,6 +73,7 @@ storage:
               labels:
                 # https://traefik.io/blog/traefik-2-0-docker-101-fc2893944b9d/
                 # middleware redirect
+                - "traefik.enable=true"
                 - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
                 # global redirect to https
@@ -76,9 +81,17 @@ storage:
                 - "traefik.http.routers.redirs.entrypoints=web"
                 - "traefik.http.routers.redirs.middlewares=redirect-to-https"
 
+                # global middle wares
+                - "traefik.http.middlewares.our-slash.chain.middlewares=strip-prefix-1,strip-prefix-2"
+                - "traefik.http.middlewares.strip-prefix-1.redirectregex.regex=^(https?://[^/]+/[a-z0-9_]+)$$"
+                - "traefik.http.middlewares.strip-prefix-1.redirectregex.replacement=$$${1}/"
+                - "traefik.http.middlewares.strip-prefix-1.redirectregex.permanent=true"
+                - "traefik.http.middlewares.strip-prefix-2.stripprefixregex.regex=/[a-z0-9_]+"
 
                 # router for traefik dsahboard
-                - "traefik.http.routers.traefik.rule=Host(`traefik.${domain_name}`)"
+                - "traefik.http.routers.traefik.rule=Host(`lucy.hrndz.ca`) && (PathPrefix(`/traefik`) || PathPrefix(`/api`))"
+                - "traefik.http.middlewares.traefik-stripprefix.stripprefix.prefixes=/traefik"
+                - "traefik.http.routers.traefik.middlewares=traefik-stripprefix"
                 - "traefik.http.routers.traefik.entrypoints=websecure"
                 - "traefik.http.routers.traefik.service=api@internal"
                 - "traefik.http.routers.traefik.tls.certresolver=mydnschallenge"
@@ -93,3 +106,9 @@ systemd:
   units:
     - name: docker-compose@traefik.service
       enabled: true
+      dropins:
+        - name: traefik-net-perms.conf
+          contents: |-
+            [Service]
+            CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+            AmbientCapabilities=CAP_NET_BIND_SERVICE

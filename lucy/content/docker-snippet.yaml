@@ -7,6 +7,10 @@ systemd:
       mask: false
       enabled: true
       dropins:
+        - name: docker-env.conf
+          contents: |-
+            [Service]
+            ExecStartPre=-/usr/local/bin/docker-gen-env
         - name: traefik-network.conf
           contents: |-
             [Service]
@@ -24,6 +28,7 @@ systemd:
         User=%i
         Restart=always
         TimeoutStartSec=0
+        EnvironmentFile=-/etc/docker/env
         WorkingDirectory=/etc/docker/compose/%i
 
         ExecStartPre=-/usr/local/bin/docker-compose pull
@@ -31,7 +36,7 @@ systemd:
 
         ExecStart=/usr/local/bin/docker-compose up --force-recreate --remove-orphans
 
-        ExecStop=/usr/local/bin/docker-compse down -v
+        ExecStop=-/usr/local/bin/docker-compse down -v
 
         [Install]
         WantedBy=multi-user.target
@@ -78,3 +83,14 @@ storage:
       mode: 0755
       contents:
         source: https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-linux-x86_64
+
+    - path: /usr/local/bin/docker-gen-env
+      mode: 0755
+      contents:
+        inline: |-
+          #!/bin/bash
+
+          cat >/etc/docker/env <<-EOL
+          # Used by netdata, traefik
+          DOCKER_GROUP_ID=$(getent group docker | awk -F: '{print $3}')
+          EOL
