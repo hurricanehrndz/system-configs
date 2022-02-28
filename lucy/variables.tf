@@ -21,3 +21,7 @@ variable "cf_dns_api_token" {
 variable "traefik_id" {
   type = number
 }
+
+variable "netdata_id" {
+  type = number
+}

@@ -1,0 +1,80 @@
+---
+variant: fcos
+version: 1.4.0
+passwd:
+  users:
+    - name: netdata
+      no_create_home: true
+      shell: /bin/false
+      uid: ${netdata_id}
+      no_user_group: true
+      primary_group: isolated
+      groups:
+        - docker
+        - isolated
+
+storage:
+  directories:
+    - path: "/etc/docker/compose/netdata"
+      mode: 0750
+      user:
+        name: netdata
+      group:
+        name: isolated
+
+  files:
+    - path: "/etc/docker/compose/netdata/docker-compose.yml"
+      mode: 0640
+      user:
+        name: netdata
+      group:
+        name: isolated
+      contents:
+        inline: |-
+          version: "3.9"
+          services:
+            traefik:
+              image: netdata/netdata
+              container_name: netdata
+              hostname: "${hostname}.${domain_name}"
+              cap_add:
+                - SYS_PTRACE
+              security_opt:
+                - seccomp:unconfined
+                - apparmor:unconfined
+                - label:disable
+              volumes:
+                - netdataconfig:/etc/netdata
+                - netdatalib:/var/lib/netdata
+                - netdatacache:/var/cache/netdata
+                - /etc/passwd:/host/etc/passwd:ro
+                - /etc/group:/host/etc/group:ro
+                - /proc:/host/proc:ro
+                - /sys:/host/sys:ro
+                - /etc/os-release:/host/etc/os-release:ro
+                - /var/run/docker.sock:/var/run/docker.sock:ro
+              ports:
+                - 19999:19999
+              environment:
+                - 'PGID=$${DOCKER_GROUP_ID}'
+              labels:
+                - "traefik.enable=true"
+                - "traefik.http.services.netdata.loadbalancer.server.port=19999"
+                - "traefik.http.routers.netdata.rule=Host(`${hostname}.${domain_name}`) && PathPrefix(`/netdata`)"
+                - "traefik.http.middlewares.netdata-stripprefix.stripprefix.prefixes=/netdata"
+                - "traefik.http.routers.netdata.middlewares=netdata-stripprefix"
+                - "traefik.http.routers.netdata.entrypoints=websecure"
+                # - "traefik.http.routers.netdata.tls.certresolver=mydnschallenge"
+              networks:
+                - traefik
+          volumes:
+            netdataconfig:
+            netdatalib:
+            netdatacache:
+          networks:
+            traefik:
+              external: true
+systemd:
+  units:
+    - name: docker-compose@netdata.service
+      enabled: true
