@@ -55,7 +55,7 @@ storage:
                 - "traefik.http.middlewares.portainer-stripprefix.stripprefix.prefixes=/portainer"
                 - "traefik.http.routers.portainer.middlewares=our-slash"
                 - "traefik.http.routers.portainer.entrypoints=websecure"
-                - "traefik.http.routers.portainer.tls.certresolver=mydnschallenge"
+                - "traefik.http.routers.portainer.tls=true"
               command:
                 - "--no-analytics"
                 - "--host=unix:///var/run/docker.sock"
