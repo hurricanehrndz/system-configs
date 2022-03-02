@@ -42,10 +42,12 @@ storage:
             portainer:
               image: portainer/portainer
               container_name: portainer
-              user: "${portainer_id}:${isolated_id}"
+              user: "${portainer_id}:$${DOCKER_GROUP_ID}"
+              security_opt:
+                - label:disable
               volumes:
-                - /var/srv/portainer:/data:z
-                - /var/run/docker.sock:/var/run/docker.sock:z
+                - /var/srv/portainer:/data
+                - /var/run/docker.sock:/var/run/docker.sock
               ports:
                 - 9000:9000
               labels:
