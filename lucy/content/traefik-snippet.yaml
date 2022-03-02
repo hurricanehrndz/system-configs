@@ -89,7 +89,7 @@ storage:
                 - "traefik.http.middlewares.strip-prefix-2.stripprefixregex.regex=/[a-z0-9_]+"
 
                 # router for traefik dsahboard
-                - "traefik.http.routers.traefik.rule=Host(`lucy.hrndz.ca`) && (PathPrefix(`/traefik`) || PathPrefix(`/api`))"
+                - "traefik.http.routers.traefik.rule=Host(`${hostname}.${domain_name}`) && (PathPrefix(`/traefik`) || PathPrefix(`/api`))"
                 - "traefik.http.middlewares.traefik-stripprefix.stripprefix.prefixes=/traefik"
                 - "traefik.http.routers.traefik.middlewares=traefik-stripprefix"
                 - "traefik.http.routers.traefik.entrypoints=websecure"
