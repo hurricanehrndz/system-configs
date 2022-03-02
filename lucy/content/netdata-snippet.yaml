@@ -61,8 +61,7 @@ storage:
                 - "traefik.enable=true"
                 - "traefik.http.services.netdata.loadbalancer.server.port=19999"
                 - "traefik.http.routers.netdata.rule=Host(`${hostname}.${domain_name}`) && PathPrefix(`/netdata`)"
-                - "traefik.http.middlewares.netdata-stripprefix.stripprefix.prefixes=/netdata"
-                - "traefik.http.routers.netdata.middlewares=netdata-stripprefix"
+                - "traefik.http.routers.netdata.middlewares=our-slash"
                 - "traefik.http.routers.netdata.entrypoints=websecure"
                 - "traefik.http.routers.netdata.tls=true"
               networks:
