@@ -52,7 +52,6 @@ storage:
                 - "traefik.enable=true"
                 - "traefik.http.services.portainer.loadbalancer.server.port=9000"
                 - "traefik.http.routers.portainer.rule=Host(`${hostname}.${domain_name}`) && PathPrefix(`/portainer`)"
-                - "traefik.http.middlewares.portainer-stripprefix.stripprefix.prefixes=/portainer"
                 - "traefik.http.routers.portainer.middlewares=our-slash"
                 - "traefik.http.routers.portainer.entrypoints=websecure"
                 - "traefik.http.routers.portainer.tls=true"
