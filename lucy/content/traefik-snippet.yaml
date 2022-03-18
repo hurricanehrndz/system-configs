@@ -70,6 +70,7 @@ storage:
                 - "--providers.docker.defaultRule=Host(`{{ normalize .Name }}.${domain_name}`)"
                 - "--certificatesresolvers.mydnschallenge.acme.dnschallenge=true"
                 - "--certificatesresolvers.mydnschallenge.acme.dnschallenge.provider=cloudflare"
+                - "--certificatesresolvers.mydnschallenge.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
                 - "--certificatesresolvers.mydnschallenge.acme.email=postmaster@${domain_name}"
                 - "--certificatesresolvers.mydnschallenge.acme.storage=/letsencrypt/acme.json"
                 - "--serverstransport.forwardingtimeouts.idleconntimeout=10"
