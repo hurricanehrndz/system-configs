@@ -37,7 +37,7 @@
     enable = true;
     networks = {
       "99-en-dhcp" = {
-        matchConfig.name = "en*";
+        matchConfig.Name = "en*";
         networkConfig.DHCP = "yes";
       };
     };
