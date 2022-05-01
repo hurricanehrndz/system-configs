@@ -73,6 +73,7 @@
     mergerfs
     mergerfs-tools
     snapraid
+    lm_sensors
   ];
 
   # Enable the OpenSSH daemon.
