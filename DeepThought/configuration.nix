@@ -146,14 +146,15 @@
   # This seems to be consistent between reboots.
   hardware.fancontrol.config = ''
     INTERVAL=10
-    DEVPATH=hwmon0=devices/platform/coretemp.0 hwmon1=devices/platform/it87.2592
-    DEVNAME=hwmon0=coretemp hwmon1=it8613
-    FCTEMPS=hwmon1/pwm3=hwmon0/temp1_input
+    DEVPATH=hwmon1=devices/platform/it87.2608
+    DEVNAME=hwmon1=it8772
+    FCTEMPS=hwmon1/pwm3=hwmon1/temp2_input
     FCFANS= hwmon1/pwm3=hwmon1/fan3_input
-    MINTEMP=hwmon1/pwm3=20
+    MINTEMP=hwmon1/pwm3=30
     MAXTEMP=hwmon1/pwm3=60
-    MINSTART=hwmon1/pwm3=52
-    MINSTOP=hwmon1/pwm3=12
+    MINSTART=hwmon1/pwm3=150
+    MINSTOP=hwmon1/pwm3=20
+    MINPWM=hwmon1/pwm3=20
   '';
 
   security.sudo.extraRules = [
