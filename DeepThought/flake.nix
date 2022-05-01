@@ -11,6 +11,7 @@
     nixosConfigurations."DeepThought" = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
+        (import "${nixpkgs}/nixos/modules/profiles/headless.nix")
         ./configuration.nix
       ];
     };
