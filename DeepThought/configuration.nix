@@ -173,6 +173,7 @@
 
   system.activationScripts.installerCustom = ''
     mkdir -p /shares/public
+    mkdir -p /volumes/{parity1,data1,data2,data3}
   '';
 
   system.stateVersion = "21.11";
