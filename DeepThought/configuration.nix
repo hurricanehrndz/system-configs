@@ -68,12 +68,14 @@
 
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
-    neovim
-    wget
+    fd
+    lm_sensors
     mergerfs
     mergerfs-tools
+    neovim
+    parted
     snapraid
-    lm_sensors
+    wget
   ];
 
   # Enable the OpenSSH daemon.
