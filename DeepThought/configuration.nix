@@ -88,6 +88,7 @@ in
     neovim
     parted
     snapraid
+    tmux
     wget
   ];
 
