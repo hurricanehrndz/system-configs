@@ -189,7 +189,7 @@ in
     }
   ];
 
-  fileSystems = mkFileSystems [ "parity1" "data1" "data2" "data3" ];
+  # fileSystems = mkFileSystems [ "parity1" "data1" "data2" "data3" ];
 
   system.activationScripts.installerCustom = ''
     mkdir -p /shares/public
