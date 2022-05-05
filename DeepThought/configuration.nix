@@ -92,6 +92,10 @@ in
     wget
   ];
 
+  programs.neovim.viAlias = true;
+  programs.neovim.vimAlias = true;
+  programs.tmux.shortcut = "a";
+
   # Enable the OpenSSH daemon.
   services.openssh = {
     enable = true;
