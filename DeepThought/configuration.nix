@@ -6,7 +6,7 @@ let
       mkFileSystemEntry = diskLabel: {
         "/volumes/${diskLabel}" = {
           device = "/dev/disk/by-label/${diskLabel}";
-          fstype = "ext4";
+          fsType = "ext4";
         };
       };
     in
@@ -85,16 +85,20 @@ in
     lm_sensors
     mergerfs
     mergerfs-tools
-    neovim
     parted
     snapraid
-    tmux
     wget
   ];
 
-  programs.neovim.viAlias = true;
-  programs.neovim.vimAlias = true;
-  programs.tmux.shortcut = "a";
+  programs.neovim = {
+    enable = true;
+    viAlias = true;
+    vimAlias = true;
+  };
+  programs.tmux = {
+    enable = true;
+    shortcut = "a";
+  };
 
   # Enable the OpenSSH daemon.
   services.openssh = {
@@ -189,7 +193,7 @@ in
     }
   ];
 
-  # fileSystems = mkFileSystems [ "parity1" "data1" "data2" "data3" ];
+  fileSystems = mkFileSystems [ "parity1" "data1" "data2" "data3" ];
 
   system.activationScripts.installerCustom = ''
     mkdir -p /shares/public
