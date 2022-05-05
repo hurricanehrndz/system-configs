@@ -81,6 +81,7 @@ in
   # List packages installed in system profile.
   environment.systemPackages = with pkgs; [
     fd
+    gitFull
     lm_sensors
     mergerfs
     mergerfs-tools
