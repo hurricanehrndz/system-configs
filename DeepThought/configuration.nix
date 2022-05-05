@@ -1,5 +1,17 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
+let
+  mkFileSystems =
+    let
+      mkFileSystemEntry = diskLabel: {
+        "/volumes/${diskLabel}" = {
+          device = "/dev/disk/by-label/${diskLabel}";
+          fstype = "ext4";
+        };
+      };
+    in
+    diskLabelList: lib.fold (attrset: acc: lib.recursiveUpdate acc attrset) {} (map mkFileSystemEntry diskLabelList);
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -170,6 +182,8 @@
       ];
     }
   ];
+
+  fileSystems = mkFileSystems [ "parity1" "data1" "data2" "data3" ];
 
   system.activationScripts.installerCustom = ''
     mkdir -p /shares/public
