@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, snapraid-runner-src, ... }:
 
 let
   mkFileSystems =
@@ -41,7 +41,12 @@ in
   };
 
   # allowUnfree
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs = {
+    config.allowUnfree = true;
+    overlays = [
+      (final: prev: { snapraid-runner = prev.callPackage ./pkgs/snapraid-runner.nix {inherit snapraid-runner-src;}; })
+    ];
+  };
 
   # Set your time zone.
   time.timeZone = "America/Edmonton";
@@ -87,6 +92,7 @@ in
     mergerfs-tools
     parted
     snapraid
+    snapraid-runner
     wget
   ];
 
@@ -198,6 +204,7 @@ in
   system.activationScripts.installerCustom = ''
     mkdir -p /shares/public
     mkdir -p /volumes/{parity1,data1,data2,data3}
+    mkdir -p /var/snapraid
   '';
 
   system.stateVersion = "21.11";

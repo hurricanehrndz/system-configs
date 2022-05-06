@@ -18,7 +18,24 @@
     },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "snapraid-runner-src": "snapraid-runner-src"
+      }
+    },
+    "snapraid-runner-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1635680227,
+        "narHash": "sha256-aZ7+pQ64HWnNC/At61ZdgPXm24YKysBud2zPT3mcqWQ=",
+        "owner": "Chronial",
+        "repo": "snapraid-runner",
+        "rev": "60b8b6731c79eb084fabe8397ddfc308dfb4547e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Chronial",
+        "repo": "snapraid-runner",
+        "type": "github"
       }
     }
   },
