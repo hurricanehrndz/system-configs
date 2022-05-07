@@ -197,7 +197,7 @@ in
       server role = standalone server
       guest account = nobody
       map to guest = Bad User
-      min protocol = SMB2
+      min protocol = SMB3
       ea support = yes
     '';
     shares = {
