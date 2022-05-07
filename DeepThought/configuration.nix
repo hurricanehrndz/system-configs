@@ -203,7 +203,7 @@ in
     shares = {
       public = {
         path = "/shares/public";
-        comment = "Public samba share.";
+        comment = "Public Share";
         "guest ok" = "yes";
         "read only" = "no";
         "create mask" = "0644";
