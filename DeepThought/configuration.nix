@@ -211,6 +211,17 @@ in
         "force user" = "nobody";
         "force group" = "nogroup";
       };
+      media = {
+        path = "/volumes/storage/media";
+        comment = "Media Share";
+        "guest ok" = "yes";
+        "read only" = "yes";
+        "write list" = "@users";
+        "create mask" = "0644";
+        "directory mask" = "0755";
+        "force user" = "hurricane";
+        "force group" = "users";
+      };
     };
   };
 
