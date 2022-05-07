@@ -84,17 +84,24 @@ in
   };
 
   # List packages installed in system profile.
-  environment.systemPackages = with pkgs; [
-    fd
-    gitFull
-    lm_sensors
-    mergerfs
-    mergerfs-tools
-    parted
-    snapraid
-    snapraid-runner
-    wget
-  ];
+  environment = {
+    variables.EDITOR = "nvim";
+    systemPackages = with pkgs; [
+      bat
+      exa
+      fd
+      gitFull
+      lazygit
+      lm_sensors
+      mergerfs
+      mergerfs-tools
+      parted
+      ripgrep
+      skim
+      snapraid-runner
+      wget
+    ];
+  };
 
 
   programs.neovim = {
@@ -103,7 +110,6 @@ in
     vimAlias = true;
     defaultEditor = true;
   };
-  environment.variables.EDITOR = "nvim";
 
   programs.tmux = {
     enable = true;
