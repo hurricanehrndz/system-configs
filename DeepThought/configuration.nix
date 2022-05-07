@@ -96,20 +96,74 @@ in
     wget
   ];
 
+
   programs.neovim = {
     enable = true;
     viAlias = true;
     vimAlias = true;
+    defaultEditor = true;
   };
+  environment.variables.EDITOR = "nvim";
+
   programs.tmux = {
     enable = true;
     shortcut = "a";
+    keyMode = "vi";
+    terminal = "screen-256color";
+    baseIndex = 1;
   };
 
   # Enable the OpenSSH daemon.
   services.openssh = {
     enable = true;
     passwordAuthentication = false;
+  };
+
+  # enable snapraid
+  snapraid = {
+    enable = true;
+    scrub.interval = "";
+    sync.interval = "";
+    extraConfig = ''
+      nohidden
+      block_size 256
+      autosave 500
+    '';
+    contentFiles = [
+      "/var/snapraid/snapraid.content"
+      "/volumes/data1/snapraid.content"
+      "/volumes/data2/snapraid.content"
+      "/volumes/data3/snapraid.content"
+    ];
+    dataDisks = {
+      d1 = "/volumes/data1";
+      d2 = "/volumes/data2";
+      d3 = "/volumes/data3";
+    };
+    parityFiles = [
+      "/volumes/parity1/snapraid.parity"
+    ];
+    exclude = [
+      "*.bak"
+      "*.unrecoverable"
+      ".AppleDB"
+      ".AppleDouble"
+      ".DS_Store"
+      ".Spotlight-V100"
+      ".TemporaryItems"
+      ".Thumbs.db"
+      ".Trashes"
+      "._AppleDouble"
+      ".content"
+      ".fseventsd"
+      "/lost+found/"
+      "/snapraid.conf*"
+      "/tmp/"
+      "/games/"
+      "aquota.group"
+      "aquota.user"
+    ];
+
   };
 
   # Samba
@@ -199,11 +253,27 @@ in
     }
   ];
 
-  fileSystems = mkFileSystems [ "parity1" "data1" "data2" "data3" ];
+  fileSystems = (mkFileSystems [ "parity1" "data1" "data2" "data3" ]) // {
+    "/volumes/storage" = {
+      device = "/volumes/data*";
+      fsType = "fuse.mergerfs";
+      options = [
+        "defaults"
+        "nonempty"
+        "allow_other"
+        "use_ino"
+        "cache.files=off"
+        "moveonenospc=true"
+        "dropcacheonclose=true"
+        "minfreespace=200G"
+        "fsname=mergerfs"
+      ];
+    };
+  };
 
   system.activationScripts.installerCustom = ''
     mkdir -p /shares/public
-    mkdir -p /volumes/{parity1,data1,data2,data3}
+    mkdir -p /volumes/{parity1,data1,data2,data3,storage}
     mkdir -p /var/snapraid
   '';
 
